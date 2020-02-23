@@ -1,0 +1,8 @@
+- A graph data sharing website. Miliu.
+
+I've decided to go with a basic architecture that uses RDF to describe a miliu.
+
+- I may roll my own RDF persistence to database system
+
+- I want to look into the node js RDF package TBL is using
+
