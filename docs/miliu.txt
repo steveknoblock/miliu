@@ -2,4 +2,3 @@
 
 I have a graph database service setup, which I should give a try before writing my own.
 
-
