@@ -2,3 +2,19 @@
 
 I have a graph database service setup, which I should give a try before writing my own.
 
+
+
+I've done a lot of reasearch and thinking about this, now it's time to do something.
+
+What is a minimum viable product?
+
+I've done a lot of thinking about how to create a basic unit of contextual graph so it doesn't become a mess and so graphs are sharable and connectable in a modular way.
+
+It seems prudent to limit the number of relationships in a sharable graph. My thoughts are five to seven maximum. The relationships are those of a syndetic web, that is context for an item. This simplifies the unit of graph sharing and composition. Every default graph will have a central node for the item being contextualized and a few nodes directly connecting to it as contextual items. The default relationship is "is context for" or something akin to that. Limiting the type of relationships is beneficial to modularity. It's possible to create "interfaces" or different types of relationships that can be overlaid on the graph to change perspective.
+
+
+
+
+
+
+
