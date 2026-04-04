@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import auth, graphs, nodes
+from app.routers import auth, graphs, nodes, shares
 
 
 @asynccontextmanager
@@ -33,6 +33,7 @@ API_PREFIX = "/api/v1"
 app.include_router(auth.router, prefix=API_PREFIX)
 app.include_router(nodes.router, prefix=API_PREFIX)
 app.include_router(graphs.router, prefix=API_PREFIX)
+app.include_router(shares.router, prefix=API_PREFIX)
 
 
 @app.get("/health")

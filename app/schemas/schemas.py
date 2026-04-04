@@ -133,6 +133,7 @@ class GraphDetail(GraphOut):
 class ShareCreate(BaseModel):
     share_type: str = Field(..., pattern="^(private|link|public)$")
     shared_with: Optional[uuid.UUID] = None  # Required for private shares
+    expires_at: Optional[datetime] = None    # Optional expiry for link shares
 
 
 class ShareOut(BaseModel):
