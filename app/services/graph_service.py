@@ -44,8 +44,6 @@ async def _assert_owner(graph: Graph, user_id: str) -> None:
 
 
 async def _build_graph_detail(db: AsyncSession, graph: Graph) -> GraphDetail:
-    """Assemble a GraphDetail response, annotating which node is the key node."""
-    # Collect all node IDs in this graph
     context_node_ids = [e.source_node_id for e in graph.edges]
     all_node_ids = [graph.key_node_id] + context_node_ids
 
@@ -53,14 +51,32 @@ async def _build_graph_detail(db: AsyncSession, graph: Graph) -> GraphDetail:
     nodes = nodes_result.scalars().all()
 
     nodes_in_graph = [
-        NodeInGraph(**{**node.__dict__, "is_key": node.id == graph.key_node_id})
+        NodeInGraph(**{
+            "id": node.id,
+            "title": node.title,
+            "content": node.content,
+            "node_type": node.node_type,
+            "created_by": node.created_by,
+            "node_metadata": node.node_metadata,
+            "created_at": node.created_at,
+            "updated_at": node.updated_at,
+            "is_key": node.id == graph.key_node_id,
+        })
         for node in nodes
     ]
 
     edges_out = [EdgeOut.model_validate(e) for e in graph.edges]
 
     return GraphDetail(
-        **{k: v for k, v in graph.__dict__.items() if not k.startswith("_")},
+        id=graph.id,
+        title=graph.title,
+        description=graph.description,
+        key_node_id=graph.key_node_id,
+        created_by=graph.created_by,
+        parent_graph_id=graph.parent_graph_id,
+        shift_type=graph.shift_type,
+        created_at=graph.created_at,
+        updated_at=graph.updated_at,
         nodes=nodes_in_graph,
         edges=edges_out,
     )
