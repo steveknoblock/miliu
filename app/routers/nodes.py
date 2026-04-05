@@ -66,7 +66,7 @@ async def update_node(
     if payload.content is not None:
         node.content = payload.content
     if payload.metadata is not None:
-        node.metadata_ = payload.metadata
+        node.node_metadata = payload.metadata
 
     await db.flush()
     await db.refresh(node)
