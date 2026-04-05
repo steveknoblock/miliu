@@ -25,7 +25,7 @@ async def create_node(
         title=payload.title,
         content=payload.content,
         node_type=payload.node_type,
-        metadata_=payload.metadata,
+        node_metadata=payload.metadata,
         created_by=uuid.UUID(user_id),
     )
     db.add(node)
