@@ -58,7 +58,7 @@ class Node(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, onupdate=utcnow
     )
-    metadata_: Mapped[dict | None] = mapped_column("metadata", JSONB, nullable=True)
+    node_metadata: Mapped[dict | None] = mapped_column("metadata", JSONB, nullable=True)
 
     __table_args__ = (
         CheckConstraint("node_type IN ('user_post', 'web_content')", name="check_node_type"),
