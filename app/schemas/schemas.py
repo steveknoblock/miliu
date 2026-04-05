@@ -60,11 +60,11 @@ class NodeOut(BaseModel):
     content: str
     node_type: str
     created_by: uuid.UUID
-    metadata: Optional[dict[str, Any]] = None
+    metadata: Optional[dict[str, Any]] = Field(None, alias="metadata_")
     created_at: datetime
     updated_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True, "populate_by_name": True}
 
 
 class NodeInGraph(NodeOut):
