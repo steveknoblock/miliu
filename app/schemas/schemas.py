@@ -60,7 +60,7 @@ class NodeOut(BaseModel):
     content: str
     node_type: str
     created_by: uuid.UUID
-    metadata: Optional[dict[str, Any]] = None
+    node_metadata: Optional[dict[str, Any]] = None
     created_at: datetime
     updated_at: datetime
 
