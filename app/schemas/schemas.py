@@ -60,11 +60,25 @@ class NodeOut(BaseModel):
     content: str
     node_type: str
     created_by: uuid.UUID
-    metadata: Optional[dict[str, Any]] = Field(None, alias="node_metadata")
+    metadata: Optional[dict[str, Any]] = None
     created_at: datetime
     updated_at: datetime
 
-    model_config = {"from_attributes": True, "populate_by_name": True}
+    model_config = {"from_attributes": True}
+
+    @classmethod
+    def model_validate(cls, obj, **kwargs):
+        data = {
+            "id": obj.id,
+            "title": obj.title,
+            "content": obj.content,
+            "node_type": obj.node_type,
+            "created_by": obj.created_by,
+            "metadata": obj.node_metadata,
+            "created_at": obj.created_at,
+            "updated_at": obj.updated_at,
+        }
+        return cls(**data)
 
     @classmethod
     def model_validate(cls, obj, **kwargs):
