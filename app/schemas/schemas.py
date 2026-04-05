@@ -60,11 +60,17 @@ class NodeOut(BaseModel):
     content: str
     node_type: str
     created_by: uuid.UUID
-    metadata: Optional[dict[str, Any]] = Field(None, alias="metadata_")
+    metadata: Optional[dict[str, Any]] = None
     created_at: datetime
     updated_at: datetime
 
-    model_config = {"from_attributes": True, "populate_by_name": True}
+    model_config = {"from_attributes": True}
+
+    @classmethod
+    def model_validate(cls, obj, **kwargs):
+        if hasattr(obj, 'metadata_'):
+            obj.__dict__['metadata'] = obj.metadata_
+        return super().model_validate(obj, **kwargs)
 
 
 class NodeInGraph(NodeOut):
