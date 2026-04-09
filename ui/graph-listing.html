@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Posts</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 48px;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: #6b7280;
+        }
+
+        .posts-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 900px;
+            margin: 0 auto 40px;
+        }
+
+        .post-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .post-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .post-thumbnail {
+            width: 200px;
+            min-width: 200px;
+            height: auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .post-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 64px;
+            font-weight: 700;
+        }
+
+        .post-content {
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .post-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .post-description {
+            font-size: 15px;
+            color: #6b7280;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-meta {
+            margin-top: auto;
+            padding-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .post-badge {
+            background: #e0e7ff;
+            color: #4f46e5;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 32px;
+            }
+
+            .page-subtitle {
+                font-size: 16px;
+            }
+
+            .post-card {
+                flex-direction: column;
+            }
+
+            .post-thumbnail {
+                width: 100%;
+                height: 200px;
+                min-width: unset;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 20px 16px;
+            }
+
+            .page-header {
+                margin-bottom: 32px;
+            }
+
+            .post-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Graph Posts</h1>
+            <p class="page-subtitle">Explore interconnected knowledge nodes</p>
+        </div>
+
+        <div class="posts-grid" id="postsGrid"></div>
+    </div>
+
+    <script>
+        // Sample data for graph posts
+        const graphPosts = [
+            {
+                id: 1,
+                title: "Understanding Neural Networks",
+                description: "A comprehensive guide to neural networks, covering their architecture, training process, and real-world applications across various domains.",
+                thumbnail: null, // Will use gradient placeholder
+                contextCount: 5,
+                date: "2026-02-01"
+            },
+            {
+                id: 2,
+                title: "Climate Change Impacts",
+                description: "Examining the far-reaching effects of climate change on ecosystems, weather patterns, and human societies around the globe.",
+                thumbnail: null,
+                contextCount: 4,
+                date: "2026-02-03"
+            },
+            {
+                id: 3,
+                title: "Modern Web Development",
+                description: "Essential concepts and best practices for building scalable, performant web applications using modern frameworks and tools.",
+                thumbnail: null,
+                contextCount: 5,
+                date: "2026-02-05"
+            },
+            {
+                id: 4,
+                title: "Renaissance Art History",
+                description: "A deep dive into the artistic movements, techniques, and masterpieces that defined the Renaissance period in Europe.",
+                thumbnail: null,
+                contextCount: 3,
+                date: "2026-02-06"
+            },
+            {
+                id: 5,
+                title: "Quantum Computing Basics",
+                description: "Introduction to quantum computing principles, qubit behavior, and the potential revolutionary applications of this emerging technology.",
+                thumbnail: null,
+                contextCount: 4,
+                date: "2026-02-07"
+            },
+            {
+                id: 6,
+                title: "Sustainable Agriculture",
+                description: null, // Example without description
+                thumbnail: null,
+                contextCount: 3,
+                date: "2026-02-07"
+            }
+        ];
+
+        // Gradient options for thumbnails
+        const gradients = [
+            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            'linear-gradient(135deg, #30cfd0 0%, #330867 100%)'
+        ];
+
+        function renderPosts() {
+            const grid = document.getElementById('postsGrid');
+            
+            graphPosts.forEach((post, index) => {
+                const card = document.createElement('a');
+                card.className = 'post-card';
+                card.href = '#'; // Would link to individual post page
+                card.onclick = (e) => {
+                    e.preventDefault();
+                    console.log(`Clicked on post: ${post.title}`);
+                    // Navigate to graph presentation page
+                };
+
+                const gradient = gradients[index % gradients.length];
+                const firstLetter = post.title.charAt(0);
+
+                card.innerHTML = `
+                    <div class="post-thumbnail" style="background: ${gradient}">
+                        ${post.thumbnail ? 
+                            `<img src="${post.thumbnail}" alt="${post.title}">` :
+                            `<div class="thumbnail-placeholder">${firstLetter}</div>`
+                        }
+                    </div>
+                    <div class="post-content">
+                        <h2 class="post-title">${post.title}</h2>
+                        ${post.description ? 
+                            `<p class="post-description">${post.description}</p>` : 
+                            ''
+                        }
+                        <div class="post-meta">
+                            <span class="post-badge">${post.contextCount} context nodes</span>
+                            <span>•</span>
+                            <span>${formatDate(post.date)}</span>
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { month: 'short', day: 'numeric', year: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Initialize
+        renderPosts();
+    </script>
+</body>
+</html>

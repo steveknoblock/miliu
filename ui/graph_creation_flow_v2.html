@@ -1,0 +1,444 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+.creator{font-family:'DM Sans',sans-serif;background:var(--color-background-primary);min-height:640px;display:flex;flex-direction:column;}
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:0.5px solid var(--color-border-tertiary);gap:12px;}
+.app-wordmark{font-family:'DM Serif Display',serif;font-size:18px;color:var(--color-text-primary);}
+.breadcrumb-sep{color:var(--color-text-tertiary);font-size:15px;margin:0 6px;}
+.breadcrumb-label{font-size:13px;color:var(--color-text-secondary);}
+.graph-title-wrap{display:flex;align-items:center;gap:6px;flex:1;max-width:340px;justify-content:center;}
+.graph-title-input{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--color-text-primary);background:transparent;border:none;outline:none;width:100%;border-bottom:1px dashed var(--color-border-secondary);padding:2px 0;text-align:center;}
+.graph-title-input::placeholder{color:var(--color-text-tertiary);font-weight:400;}
+.auto-badge{font-size:10px;font-family:'DM Mono',monospace;color:var(--color-text-tertiary);border:0.5px solid var(--color-border-tertiary);padding:2px 5px;border-radius:4px;white-space:nowrap;transition:opacity 0.2s;}
+.top-actions{display:flex;gap:8px;}
+.btn{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:7px 14px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);transition:background 0.15s,color 0.15s;}
+.btn:hover{background:var(--color-background-secondary);color:var(--color-text-primary);}
+.btn-primary{background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary);}
+.btn-primary:hover{opacity:0.82;background:var(--color-text-primary);color:var(--color-background-primary);}
+.btn-primary:disabled{opacity:0.28;cursor:not-allowed;}
+.main-layout{display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:0;}
+.panel{display:flex;flex-direction:column;overflow:hidden;}
+.panel-left{border-right:0.5px solid var(--color-border-tertiary);}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:0.5px solid var(--color-border-tertiary);flex-shrink:0;}
+.panel-label{font-size:10px;font-family:'DM Mono',monospace;font-weight:500;letter-spacing:0.8px;text-transform:uppercase;color:var(--color-text-tertiary);display:flex;align-items:center;gap:6px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--color-border-secondary);display:inline-block;flex-shrink:0;}
+.dot.key{background:#534AB7;}
+.dot.ctx{background:#0F6E56;}
+.panel-body{flex:1;overflow-y:auto;padding:20px;}
+.mode-toggle{display:flex;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden;background:var(--color-background-secondary);}
+.mode-btn{flex:1;padding:6px 10px;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--color-text-secondary);transition:all 0.12s;}
+.mode-btn.active{background:var(--color-background-primary);color:var(--color-text-primary);border:0.5px solid var(--color-border-secondary);border-radius:calc(var(--border-radius-md) - 1px);margin:2px;}
+.field{margin-bottom:14px;}
+.field-label{font-size:10px;font-weight:500;color:var(--color-text-secondary);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;text-transform:uppercase;letter-spacing:0.5px;}
+.field input[type=text],.field textarea{width:100%;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--color-text-primary);background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:9px 12px;outline:none;resize:none;transition:border-color 0.15s;}
+.field input:focus,.field textarea:focus{border-color:#7F77DD;box-shadow:0 0 0 2px rgba(127,119,221,0.1);}
+.editor-toolbar{display:flex;gap:2px;padding:5px 7px;border:0.5px solid var(--color-border-secondary);border-bottom:none;border-radius:var(--border-radius-md) var(--border-radius-md) 0 0;background:var(--color-background-secondary);}
+.tb{font-family:'DM Mono',monospace;font-size:12px;padding:3px 6px;border:none;background:transparent;cursor:pointer;color:var(--color-text-secondary);border-radius:3px;transition:background 0.1s;}
+.tb:hover{background:var(--color-background-primary);color:var(--color-text-primary);}
+.tb.sep{color:var(--color-border-secondary);cursor:default;padding:3px 2px;}
+.editor-area{font-family:'DM Mono',monospace!important;font-size:13px!important;line-height:1.65;border-radius:0 0 var(--border-radius-md) var(--border-radius-md)!important;min-height:160px;}
+.preview-area{border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:12px;min-height:160px;font-size:14px;line-height:1.7;color:var(--color-text-primary);background:var(--color-background-primary);}
+.preview-area h1{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:10px;font-weight:400;}
+.preview-area h2{font-size:16px;font-weight:500;margin-bottom:8px;margin-top:14px;}
+.preview-area p{margin-bottom:8px;color:var(--color-text-secondary);}
+.preview-area strong{color:var(--color-text-primary);font-weight:500;}
+.preview-area code{font-family:'DM Mono',monospace;font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:3px;}
+.preview-area ul{padding-left:18px;color:var(--color-text-secondary);}
+.preview-area li{margin-bottom:3px;}
+.preview-area .empty{color:var(--color-text-tertiary);font-style:italic;}
+.ptoggle{display:flex;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden;background:var(--color-background-secondary);}
+.ptoggle-btn{flex:1;padding:4px 9px;font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--color-text-tertiary);transition:all 0.12s;}
+.ptoggle-btn.active{background:var(--color-background-primary);color:var(--color-text-primary);border:0.5px solid var(--color-border-secondary);border-radius:calc(var(--border-radius-md) - 1px);margin:2px;}
+.search-wrap{position:relative;margin-bottom:10px;}
+.search-wrap input{width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px 8px 30px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);outline:none;}
+.search-wrap input:focus{border-color:#7F77DD;}
+.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--color-text-tertiary);font-size:13px;pointer-events:none;}
+.node-list{display:flex;flex-direction:column;gap:5px;}
+.nli{padding:9px 11px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);cursor:pointer;transition:border-color 0.12s,background 0.12s;background:var(--color-background-primary);}
+.nli:hover{border-color:var(--color-border-secondary);background:var(--color-background-secondary);}
+.nli.sel{border-color:#7F77DD;background:#EEEDFE;}
+.nli-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px;}
+.nli.sel .nli-title{color:#3C3489;}
+.nli-preview{font-size:11px;color:var(--color-text-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nli.sel .nli-preview{color:#534AB7;}
+.type-chip{display:inline-block;font-size:9px;font-family:'DM Mono',monospace;padding:1px 4px;border-radius:3px;margin-left:4px;vertical-align:middle;background:var(--color-background-secondary);color:var(--color-text-tertiary);border:0.5px solid var(--color-border-tertiary);}
+
+/* Context panel — chip strip + editor takeover */
+.ctx-panel-locked{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:8px;color:var(--color-text-tertiary);padding:40px 20px;text-align:center;}
+.ctx-panel-content{display:flex;flex-direction:column;flex:1;min-height:0;}
+.chip-strip{padding:14px 20px 12px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;flex-wrap:wrap;gap:7px;align-items:center;flex-shrink:0;}
+.ctx-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px 5px 12px;border-radius:20px;font-size:12px;font-weight:500;background:#E1F5EE;color:#085041;border:0.5px solid #5DCAA5;white-space:nowrap;}
+.ctx-chip-remove{width:14px;height:14px;border-radius:50%;border:none;background:#9FE1CB;color:#04342C;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;line-height:1;padding:0;transition:background 0.1s;}
+.ctx-chip-remove:hover{background:#5DCAA5;}
+.add-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;background:transparent;color:var(--color-text-secondary);border:0.5px dashed var(--color-border-secondary);cursor:pointer;transition:border-color 0.15s,color 0.15s,background 0.15s;font-family:'DM Sans',sans-serif;}
+.add-chip:hover{border-color:#1D9E75;color:#0F6E56;background:#E1F5EE;}
+.add-chip.active{border-color:#1D9E75;color:#0F6E56;background:#E1F5EE;border-style:solid;}
+.ctx-count{font-size:10px;font-family:'DM Mono',monospace;color:var(--color-text-tertiary);margin-left:2px;}
+.ctx-editor-panel{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;}
+.ctx-editor-header{display:flex;align-items:center;justify-content:space-between;}
+.ctx-editor-label{font-size:11px;font-family:'DM Mono',monospace;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.6px;}
+.ctx-empty-hint{flex:1;display:flex;align-items:center;justify-content:center;color:var(--color-text-tertiary);font-size:13px;font-style:italic;}
+
+/* Bottom strip */
+.preview-strip{border-top:0.5px solid var(--color-border-tertiary);padding:10px 20px;display:flex;align-items:center;gap:8px;background:var(--color-background-secondary);overflow-x:auto;flex-shrink:0;}
+.strip-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--color-text-tertiary);letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+.strip-key-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;background:#EEEDFE;color:#3C3489;border:0.5px solid #AFA9EC;white-space:nowrap;flex-shrink:0;}
+.strip-ctx-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:20px;font-size:11px;background:#E1F5EE;color:#085041;border:0.5px solid #5DCAA5;white-space:nowrap;flex-shrink:0;}
+.strip-arrow{color:var(--color-text-tertiary);font-size:11px;flex-shrink:0;}
+.strip-empty{font-size:12px;color:var(--color-text-tertiary);font-style:italic;}
+
+/* Key node confirmed state */
+.key-confirmed{display:flex;flex-direction:column;gap:12px;}
+.key-confirmed-card{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px;position:relative;}
+.key-confirmed-label{font-size:9px;font-family:'DM Mono',monospace;color:#534AB7;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px;}
+.key-confirmed-title{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px;}
+.key-confirmed-preview{font-size:12px;color:var(--color-text-secondary);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.key-change-btn{position:absolute;top:12px;right:12px;font-size:11px;color:var(--color-text-tertiary);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:2px 6px;border-radius:4px;}
+.key-change-btn:hover{background:var(--color-background-primary);color:var(--color-text-primary);}
+</style>
+
+<h2 class="sr-only">Graph creation — set a key node and add up to 4 context nodes as chips</h2>
+
+<div class="creator">
+  <div class="top-bar">
+    <div style="display:flex;align-items:center;">
+      <span class="app-wordmark">miliu</span>
+      <span class="breadcrumb-sep">/</span>
+      <span class="breadcrumb-label">new graph</span>
+    </div>
+    <div class="graph-title-wrap">
+      <input class="graph-title-input" id="graphTitle" type="text" placeholder="Graph title" />
+      <span class="auto-badge" id="autoBadge">auto</span>
+    </div>
+    <div class="top-actions">
+      <button class="btn">Discard</button>
+      <button class="btn btn-primary" id="publishBtn" disabled>Publish</button>
+    </div>
+  </div>
+
+  <div class="main-layout">
+    <!-- LEFT: Key node -->
+    <div class="panel panel-left">
+      <div class="panel-header">
+        <span class="panel-label"><span class="dot key"></span>Key node</span>
+        <div class="mode-toggle" id="keyModeToggle">
+          <button class="mode-btn active" onclick="setKeyMode('create')">Write new</button>
+          <button class="mode-btn" onclick="setKeyMode('pick')">Pick existing</button>
+        </div>
+      </div>
+      <div class="panel-body" id="keyBody"></div>
+    </div>
+
+    <!-- RIGHT: Context nodes -->
+    <div class="panel" id="ctxPanel">
+      <div class="panel-header">
+        <span class="panel-label"><span class="dot ctx"></span>Context nodes</span>
+        <span class="ctx-count" id="ctxCount">0 / 4</span>
+      </div>
+      <div id="ctxPanelInner" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;"></div>
+    </div>
+  </div>
+
+  <div class="preview-strip">
+    <span class="strip-label">Graph</span>
+    <span class="strip-empty" id="stripEmpty">Set a key node to begin</span>
+    <div id="stripNodes" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+const EXISTING = [
+  {id:'e1',title:'Fiat Lux',content:'First light — the beginning of all things visible.',node_type:'user_post'},
+  {id:'e2',title:'The Dark Cabinet',content:'The absence of light as a structural force in perception.',node_type:'user_post'},
+  {id:'e3',title:'Wave-Particle Duality',content:'## Quantum nature\n\nLight behaves as both a wave and a particle depending on how it is observed.',node_type:'user_post'},
+  {id:'e4',title:'Photosynthesis Overview',content:'Plants convert light energy into chemical energy stored in glucose via chlorophyll.',node_type:'web_content'},
+  {id:'e5',title:"Newton's Opticks (1704)",content:"Newton's foundational text on the nature and behaviour of light and colour.",node_type:'web_content'},
+  {id:'e6',title:'Color Theory Basics',content:'How hue, saturation, and value combine to produce the visible spectrum.',node_type:'user_post'},
+];
+
+let keyMode = 'create';
+let keyNode = null;
+let titleAutoSync = true;
+let keyCreate = {title:'',content:'',view:'edit'};
+let keyPickSearch = '';
+
+let ctxNodes = []; // confirmed context nodes: {id, title, content}
+let addingCtx = false;
+let ctxMode = 'create';
+let ctxCreate = {title:'',content:'',view:'edit'};
+let ctxPickSearch = '';
+
+function esc(s){if(!s)return '';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function md(s){try{return marked.parse(s);}catch(e){return esc(s);}}
+function plain(s){return s.replace(/[#*`>_~\[\]]/g,'').trim();}
+
+// ── KEY NODE ─────────────────────────────────────────────────────────────────
+
+function setKeyMode(mode){
+  keyMode = mode;
+  document.querySelectorAll('#keyModeToggle .mode-btn').forEach((b,i)=>b.classList.toggle('active',i===(mode==='create'?0:1)));
+  renderKey();
+}
+
+function renderKey(){
+  const body = document.getElementById('keyBody');
+  if(keyNode){
+    body.innerHTML = `
+      <div class="key-confirmed">
+        <div class="key-confirmed-card">
+          <div class="key-confirmed-label">Key node</div>
+          <div class="key-confirmed-title">${esc(keyNode.title)}</div>
+          <div class="key-confirmed-preview">${esc(plain(keyNode.content).substring(0,120))}</div>
+          <button class="key-change-btn" onclick="changeKeyNode()">Change</button>
+        </div>
+        <p style="font-size:12px;color:var(--color-text-tertiary);line-height:1.5;">This is the focus of your graph. Context nodes provide supporting material for it.</p>
+      </div>`;
+    return;
+  }
+  if(keyMode==='create'){
+    body.innerHTML = `
+      <div class="field">
+        <label class="field-label">Title</label>
+        <input type="text" id="kTitle" value="${esc(keyCreate.title)}" placeholder="What is this node about?" />
+      </div>
+      <div class="field">
+        <label class="field-label">
+          Content
+          <div class="ptoggle">
+            <button class="ptoggle-btn ${keyCreate.view==='edit'?'active':''}" onclick="setKeyView('edit')">Edit</button>
+            <button class="ptoggle-btn ${keyCreate.view==='preview'?'active':''}" onclick="setKeyView('preview')">Preview</button>
+          </div>
+        </label>
+        ${keyCreate.view==='edit'?`
+          <div class="editor-toolbar">
+            <button class="tb" onclick="ins('kContent','**','**')">B</button>
+            <button class="tb" style="font-style:italic" onclick="ins('kContent','*','*')">I</button>
+            <button class="tb sep">|</button>
+            <button class="tb" onclick="ins('kContent','## ','')">H2</button>
+            <button class="tb" onclick="ins('kContent','### ','')">H3</button>
+            <button class="tb sep">|</button>
+            <button class="tb" onclick="ins('kContent','- ','')">List</button>
+            <button class="tb" onclick="ins('kContent','> ','')">Quote</button>
+            <button class="tb" onclick="ins('kContent','\`','\`')">Code</button>
+          </div>
+          <textarea class="editor-area" id="kContent" rows="9" placeholder="Write in markdown…">${esc(keyCreate.content)}</textarea>
+        `:`
+          <div class="preview-area">${keyCreate.content?md(keyCreate.content):'<p class="empty">Nothing to preview yet.</p>'}</div>
+        `}
+      </div>
+      ${keyCreate.title?`<button class="btn btn-primary" style="width:100%" onclick="confirmKeyCreate()">Set as key node</button>`:''}
+    `;
+    bind('kTitle',e=>{keyCreate.title=e.target.value;renderKey();if(titleAutoSync)syncTitle(e.target.value);});
+    bind('kContent',e=>keyCreate.content=e.target.value);
+  } else {
+    const f=EXISTING.filter(n=>!keyPickSearch||n.title.toLowerCase().includes(keyPickSearch.toLowerCase())||n.content.toLowerCase().includes(keyPickSearch.toLowerCase()));
+    body.innerHTML = `
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="kSearch" value="${esc(keyPickSearch)}" placeholder="Search your nodes…" />
+      </div>
+      <div class="node-list">
+        ${f.map(n=>`
+          <div class="nli ${keyNode&&keyNode.id===n.id?'sel':''}" onclick="selectKey('${n.id}')">
+            <div class="nli-title">${esc(n.title)}<span class="type-chip">${n.node_type==='web_content'?'web':'post'}</span></div>
+            <div class="nli-preview">${esc(plain(n.content).substring(0,80))}</div>
+          </div>`).join('')}
+        ${f.length===0?`<p style="font-size:13px;color:var(--color-text-tertiary);text-align:center;padding:20px 0">No nodes found.</p>`:''}
+      </div>
+    `;
+    bind('kSearch',e=>{keyPickSearch=e.target.value;renderKey();});
+  }
+}
+
+function setKeyView(v){
+  const ta=document.getElementById('kContent');if(ta)keyCreate.content=ta.value;
+  keyCreate.view=v;renderKey();
+}
+
+function confirmKeyCreate(){
+  const ta=document.getElementById('kContent');if(ta)keyCreate.content=ta.value;
+  keyNode={id:'new-key',title:keyCreate.title,content:keyCreate.content,isNew:true};
+  if(titleAutoSync)syncTitle(keyNode.title);
+  afterKeySet();
+}
+
+function selectKey(id){
+  keyNode=EXISTING.find(n=>n.id===id);
+  if(titleAutoSync)syncTitle(keyNode.title);
+  afterKeySet();
+}
+
+function changeKeyNode(){
+  keyNode=null;keyCreate={title:'',content:'',view:'edit'};keyPickSearch='';
+  renderKey();renderCtx();updateStrip();updatePublish();
+}
+
+function afterKeySet(){renderKey();renderCtx();updateStrip();updatePublish();}
+
+function syncTitle(v){document.getElementById('graphTitle').value=v;}
+
+// ── CONTEXT NODES ─────────────────────────────────────────────────────────────
+
+function renderCtx(){
+  const inner=document.getElementById('ctxPanelInner');
+  document.getElementById('ctxCount').textContent=ctxNodes.length+' / 4';
+  if(!keyNode){
+    inner.innerHTML=`<div class="ctx-panel-locked"><div style="font-size:22px;opacity:0.3">○</div><p style="font-size:13px;line-height:1.5">Set a key node first.<br>Context nodes provide supporting material for it.</p></div>`;
+    return;
+  }
+  const usedIds=ctxNodes.map(n=>n.id);
+  const available=EXISTING.filter(n=>n.id!==keyNode?.id&&!usedIds.includes(n.id));
+  const filteredAvail=available.filter(n=>!ctxPickSearch||n.title.toLowerCase().includes(ctxPickSearch.toLowerCase())||n.content.toLowerCase().includes(ctxPickSearch.toLowerCase()));
+  const canAdd=ctxNodes.length<4;
+
+  let chipsHtml=ctxNodes.map(n=>`
+    <div class="ctx-chip">
+      ${esc(n.title)}
+      <button class="ctx-chip-remove" onclick="removeCtx('${n.id}')" title="Remove">×</button>
+    </div>`).join('');
+  if(canAdd){
+    chipsHtml+=`<button class="add-chip ${addingCtx?'active':''}" onclick="toggleAddCtx()">+ Add context node</button>`;
+  }
+
+  let editorHtml='';
+  if(addingCtx){
+    editorHtml=`
+      <div class="ctx-editor-panel" id="ctxEditorPanel">
+        <div class="ctx-editor-header">
+          <span class="ctx-editor-label">New context node</span>
+          <div class="mode-toggle">
+            <button class="mode-btn ${ctxMode==='create'?'active':''}" onclick="setCtxMode('create')">Write new</button>
+            <button class="mode-btn ${ctxMode==='pick'?'active':''}" onclick="setCtxMode('pick')">Pick existing</button>
+          </div>
+        </div>
+        ${ctxMode==='create'?`
+          <div class="field">
+            <label class="field-label">Title</label>
+            <input type="text" id="ctxTitle" value="${esc(ctxCreate.title)}" placeholder="Node title" />
+          </div>
+          <div class="field">
+            <label class="field-label">
+              Content
+              <div class="ptoggle">
+                <button class="ptoggle-btn ${ctxCreate.view==='edit'?'active':''}" onclick="setCtxView('edit')">Edit</button>
+                <button class="ptoggle-btn ${ctxCreate.view==='preview'?'active':''}" onclick="setCtxView('preview')">Preview</button>
+              </div>
+            </label>
+            ${ctxCreate.view==='edit'?`
+              <div class="editor-toolbar">
+                <button class="tb" onclick="ins('ctxContent','**','**')">B</button>
+                <button class="tb" style="font-style:italic" onclick="ins('ctxContent','*','*')">I</button>
+                <button class="tb sep">|</button>
+                <button class="tb" onclick="ins('ctxContent','## ','')">H2</button>
+                <button class="tb" onclick="ins('ctxContent','### ','')">H3</button>
+                <button class="tb sep">|</button>
+                <button class="tb" onclick="ins('ctxContent','- ','')">List</button>
+                <button class="tb" onclick="ins('ctxContent','> ','')">Quote</button>
+                <button class="tb" onclick="ins('ctxContent','\`','\`')">Code</button>
+              </div>
+              <textarea class="editor-area" id="ctxContent" rows="8" placeholder="Write in markdown…">${esc(ctxCreate.content)}</textarea>
+            `:`
+              <div class="preview-area">${ctxCreate.content?md(ctxCreate.content):'<p class="empty">Nothing to preview yet.</p>'}</div>
+            `}
+          </div>
+          ${ctxCreate.title?`<button class="btn btn-primary" style="width:100%" onclick="confirmCtxCreate()">Add to graph</button>`:''}
+        `:`
+          <div class="search-wrap">
+            <span class="search-icon">⌕</span>
+            <input type="text" id="ctxSearch" value="${esc(ctxPickSearch)}" placeholder="Search your nodes…" />
+          </div>
+          <div class="node-list">
+            ${filteredAvail.map(n=>`
+              <div class="nli" onclick="selectCtx('${n.id}')">
+                <div class="nli-title">${esc(n.title)}<span class="type-chip">${n.node_type==='web_content'?'web':'post'}</span></div>
+                <div class="nli-preview">${esc(plain(n.content).substring(0,80))}</div>
+              </div>`).join('')}
+            ${filteredAvail.length===0?`<p style="font-size:13px;color:var(--color-text-tertiary);text-align:center;padding:16px 0">No available nodes.</p>`:''}
+          </div>
+        `}
+      </div>`;
+  } else if(ctxNodes.length===0){
+    editorHtml=`<div class="ctx-empty-hint">No context nodes yet — they're optional.</div>`;
+  } else {
+    editorHtml=`<div class="ctx-empty-hint" style="font-style:normal;color:var(--color-text-secondary);font-size:13px;">${ctxNodes.length} context node${ctxNodes.length>1?'s':''} added.</div>`;
+  }
+
+  inner.innerHTML=`
+    <div class="chip-strip">${chipsHtml}</div>
+    ${editorHtml}
+  `;
+
+  bind('ctxTitle',e=>{ctxCreate.title=e.target.value;renderCtx();});
+  bind('ctxContent',e=>ctxCreate.content=e.target.value);
+  bind('ctxSearch',e=>{ctxPickSearch=e.target.value;renderCtx();});
+}
+
+function toggleAddCtx(){
+  addingCtx=!addingCtx;
+  ctxCreate={title:'',content:'',view:'edit'};
+  ctxPickSearch='';
+  renderCtx();
+}
+
+function setCtxMode(mode){ctxMode=mode;renderCtx();}
+
+function setCtxView(v){
+  const ta=document.getElementById('ctxContent');if(ta)ctxCreate.content=ta.value;
+  ctxCreate.view=v;renderCtx();
+}
+
+function confirmCtxCreate(){
+  const ta=document.getElementById('ctxContent');if(ta)ctxCreate.content=ta.value;
+  ctxNodes.push({id:'new-ctx-'+Date.now(),title:ctxCreate.title,content:ctxCreate.content,isNew:true});
+  addingCtx=false;ctxCreate={title:'',content:'',view:'edit'};
+  renderCtx();updateStrip();updatePublish();
+}
+
+function selectCtx(id){
+  const n=EXISTING.find(x=>x.id===id);
+  ctxNodes.push(n);
+  addingCtx=false;ctxPickSearch='';
+  renderCtx();updateStrip();updatePublish();
+}
+
+function removeCtx(id){
+  ctxNodes=ctxNodes.filter(n=>n.id!==id);
+  if(addingCtx&&ctxNodes.length>=4)addingCtx=false;
+  renderCtx();updateStrip();updatePublish();
+}
+
+// ── UTILITIES ─────────────────────────────────────────────────────────────────
+
+function updateStrip(){
+  const empty=document.getElementById('stripEmpty');
+  const nodes=document.getElementById('stripNodes');
+  if(!keyNode){empty.style.display='';nodes.innerHTML='';return;}
+  empty.style.display='none';
+  let h=`<div class="strip-key-chip">◆ ${esc(keyNode.title)}</div>`;
+  ctxNodes.forEach(n=>{h+=`<span class="strip-arrow">←</span><div class="strip-ctx-chip">${esc(n.title)}</div>`;});
+  nodes.innerHTML=h;
+}
+
+function updatePublish(){document.getElementById('publishBtn').disabled=!keyNode;}
+
+function bind(id,fn){const el=document.getElementById(id);if(el)el.addEventListener('input',fn);}
+
+function ins(id,before,after){
+  const ta=document.getElementById(id);if(!ta)return;
+  const s=ta.selectionStart,e=ta.selectionEnd,sel=ta.value.substring(s,e);
+  ta.value=ta.value.substring(0,s)+before+sel+after+ta.value.substring(e);
+  ta.focus();ta.selectionStart=s+before.length;ta.selectionEnd=e+before.length;
+  if(id==='kContent')keyCreate.content=ta.value;
+  else ctxCreate.content=ta.value;
+}
+
+document.getElementById('graphTitle').addEventListener('input',e=>{
+  titleAutoSync=false;
+  document.getElementById('autoBadge').style.opacity='0.3';
+});
+
+renderKey();
+renderCtx();
+</script>

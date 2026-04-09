@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Presentation UI</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .graph-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            padding-bottom: 400px;
+        }
+
+        .key-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            padding: 32px;
+            max-width: 700px;
+            margin: 0 auto 100px;
+            border: 2px solid #3b82f6;
+        }
+
+        .key-card-header {
+            color: #3b82f6;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .context-cards-container {
+            position: relative;
+            height: 400px;
+        }
+
+        .context-card {
+            position: absolute;
+            width: 320px;
+            height: 220px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+
+        .context-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transform: translateY(-4px);
+            border-color: #3b82f6;
+        }
+
+        .context-card-header {
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .context-card-content {
+            position: relative;
+            height: calc(100% - 28px);
+            overflow: hidden;
+        }
+
+        .context-card-content::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(to bottom, transparent, white);
+            pointer-events: none;
+        }
+
+        .markdown-content h1 {
+            font-size: 24px;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+
+        .markdown-content h2 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #374151;
+        }
+
+        .markdown-content h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #4b5563;
+        }
+
+        .markdown-content p {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            color: #4b5563;
+        }
+
+        .markdown-content ul, .markdown-content ol {
+            margin-bottom: 12px;
+            padding-left: 24px;
+        }
+
+        .markdown-content li {
+            margin-bottom: 6px;
+            line-height: 1.6;
+            color: #4b5563;
+        }
+
+        .markdown-content code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .markdown-content pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-bottom: 12px;
+        }
+
+        .markdown-content pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f3f4f6;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #e5e7eb;
+        }
+
+        .modal-header {
+            color: #3b82f6;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="graph-container">
+        <!-- Key Card -->
+        <div class="key-card">
+            <div class="key-card-header">Key Node</div>
+            <div class="markdown-content" id="keyContent"></div>
+        </div>
+
+        <!-- Context Cards -->
+        <div class="context-cards-container" id="contextContainer"></div>
+    </div>
+
+    <!-- Modal for full content -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div class="modal-header">Context Node</div>
+            <div class="markdown-content" id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const graphData = {
+            keyNode: `# Understanding Neural Networks
+
+Neural networks are computational models inspired by biological neural networks in animal brains. They consist of interconnected nodes (neurons) organized in layers.
+
+## Key Components
+
+- **Input Layer**: Receives initial data
+- **Hidden Layers**: Process information through weighted connections
+- **Output Layer**: Produces final predictions
+
+The power of neural networks lies in their ability to learn complex patterns through training on large datasets.`,
+            
+            contextNodes: [
+                {
+                    title: "Historical Context",
+                    content: `# Historical Development
+
+The concept of artificial neural networks dates back to the 1940s with the McCulloch-Pitts neuron model.
+
+## Major Milestones
+
+- **1943**: McCulloch & Pitts create first computational model
+- **1958**: Rosenblatt develops the Perceptron
+- **1986**: Backpropagation algorithm popularized
+- **2012**: Deep learning revolution begins with AlexNet
+
+The field experienced multiple "AI winters" before recent breakthroughs made deep learning practical for real-world applications.`
+                },
+                {
+                    title: "Mathematical Foundation",
+                    content: `# Mathematical Principles
+
+Neural networks rely on linear algebra and calculus for their operation.
+
+## Core Concepts
+
+**Activation Functions**: Non-linear transformations like ReLU, sigmoid, and tanh that allow networks to learn complex patterns.
+
+**Gradient Descent**: Optimization algorithm that adjusts weights to minimize error:
+
+\`\`\`
+w = w - learning_rate * gradient
+\`\`\`
+
+**Backpropagation**: Efficiently computes gradients through the chain rule, enabling training of deep networks with many layers.`
+                },
+                {
+                    title: "Applications",
+                    content: `# Real-World Applications
+
+Neural networks power many modern AI systems across diverse domains.
+
+## Common Use Cases
+
+- **Computer Vision**: Image classification, object detection, facial recognition
+- **Natural Language Processing**: Translation, sentiment analysis, text generation
+- **Speech Recognition**: Voice assistants, transcription services
+- **Recommendation Systems**: Content suggestions on streaming platforms
+- **Autonomous Vehicles**: Perception and decision-making systems
+- **Healthcare**: Medical image analysis, drug discovery
+
+The versatility of neural networks makes them applicable to almost any domain with sufficient data.`
+                },
+                {
+                    title: "Training Process",
+                    content: `# How Neural Networks Learn
+
+Training a neural network involves iteratively adjusting weights to improve performance.
+
+## Training Steps
+
+1. **Initialize** weights randomly
+2. **Forward pass**: Feed data through network
+3. **Calculate loss**: Measure prediction error
+4. **Backward pass**: Compute gradients
+5. **Update weights**: Apply gradient descent
+6. **Repeat**: Until convergence or stopping criteria
+
+**Hyperparameters** like learning rate, batch size, and architecture must be carefully tuned for optimal performance.`
+                },
+                {
+                    title: "Challenges & Limitations",
+                    content: `# Current Challenges
+
+Despite their success, neural networks face several important limitations.
+
+## Key Issues
+
+- **Data Requirements**: Need large labeled datasets
+- **Computational Cost**: Training large models requires significant resources
+- **Interpretability**: "Black box" nature makes them difficult to understand
+- **Overfitting**: Can memorize training data rather than learning generalizable patterns
+- **Adversarial Vulnerability**: Small perturbations can fool networks
+
+Ongoing research addresses these challenges through techniques like transfer learning, model compression, and explainable AI.`
+                }
+            ]
+        };
+
+        // Render key node
+        document.getElementById('keyContent').innerHTML = marked.parse(graphData.keyNode);
+
+        // Render context nodes in semi-circle
+        const container = document.getElementById('contextContainer');
+        const numCards = graphData.contextNodes.length;
+        const containerWidth = 1400;
+        const radius = 300;
+        
+        graphData.contextNodes.forEach((node, index) => {
+            const card = document.createElement('div');
+            card.className = 'context-card';
+            
+            // Calculate position on semi-circle
+            // Distribute cards evenly along 180 degrees
+            const angle = Math.PI * (index / (numCards - 1 || 1)); // 0 to PI
+            const x = containerWidth / 2 + radius * Math.cos(angle + Math.PI) - 160; // -160 to center card
+            const y = radius * Math.sin(angle + Math.PI) + 50;
+            
+            card.style.left = `${x}px`;
+            card.style.top = `${y}px`;
+            
+            card.innerHTML = `
+                <div class="context-card-header">Context ${index + 1}</div>
+                <div class="context-card-content markdown-content">
+                    ${marked.parse(node.content)}
+                </div>
+            `;
+            
+            card.onclick = () => openModal(node.content);
+            container.appendChild(card);
+        });
+
+        function openModal(content) {
+            document.getElementById('modalContent').innerHTML = marked.parse(content);
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // Close modal on background click
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') {
+                closeModal();
+            }
+        });
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
