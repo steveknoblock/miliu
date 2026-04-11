@@ -60,31 +60,11 @@ class NodeOut(BaseModel):
     content: str
     node_type: str
     created_by: uuid.UUID
-    node_metadata: Optional[dict[str, Any]] = None
+    metadata: Optional[dict[str, Any]] = None
     created_at: datetime
     updated_at: datetime
 
     model_config = {"from_attributes": True}
-
-    @classmethod
-    def model_validate(cls, obj, **kwargs):
-        data = {
-            "id": obj.id,
-            "title": obj.title,
-            "content": obj.content,
-            "node_type": obj.node_type,
-            "created_by": obj.created_by,
-            "metadata": obj.node_metadata,
-            "created_at": obj.created_at,
-            "updated_at": obj.updated_at,
-        }
-        return cls(**data)
-
-    @classmethod
-    def model_validate(cls, obj, **kwargs):
-        if hasattr(obj, 'metadata_'):
-            obj.__dict__['metadata'] = obj.metadata_
-        return super().model_validate(obj, **kwargs)
 
 
 class NodeInGraph(NodeOut):
@@ -179,5 +159,53 @@ class FeedItem(GraphOut):
 class CursorPage(BaseModel):
     """Generic cursor-based pagination envelope."""
     items: list
+    next_cursor: Optional[str] = None
+    has_more: bool = False
+
+# ── Feed (per spec) ───────────────────────────────────────────────────────────
+
+class FeedAuthor(BaseModel):
+    id: uuid.UUID
+    username: str
+
+    model_config = {"from_attributes": True}
+
+
+class FeedKeyNode(BaseModel):
+    id: uuid.UUID
+    title: str
+    content_preview: str  # markdown stripped, max 200 chars, generated server-side
+
+    model_config = {"from_attributes": True}
+
+
+class FeedContextNode(BaseModel):
+    id: uuid.UUID
+    title: str
+
+    model_config = {"from_attributes": True}
+
+
+class FeedParent(BaseModel):
+    id: uuid.UUID
+    title: Optional[str]
+    author_username: str
+
+
+class FeedItemOut(BaseModel):
+    id: uuid.UUID
+    title: Optional[str]
+    created_at: datetime
+    is_public: bool
+    is_discovery: bool
+    shift_type: Optional[str]
+    author: FeedAuthor
+    key_node: FeedKeyNode
+    context_nodes: list[FeedContextNode]
+    parent: Optional[FeedParent]
+
+
+class FeedResponse(BaseModel):
+    items: list[FeedItemOut]
     next_cursor: Optional[str] = None
     has_more: bool = False

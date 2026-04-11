@@ -58,7 +58,7 @@ class Node(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, onupdate=utcnow
     )
-    node_metadata: Mapped[dict | None] = mapped_column("metadata", JSONB, nullable=True)
+    metadata_: Mapped[dict | None] = mapped_column("metadata", JSONB, nullable=True)
 
     __table_args__ = (
         CheckConstraint("node_type IN ('user_post', 'web_content')", name="check_node_type"),
@@ -189,3 +189,24 @@ class Share(Base):
     )
 
     graph: Mapped["Graph"] = relationship("Graph", back_populates="shares")
+
+
+class Follow(Base):
+    __tablename__ = "follows"
+
+    follower_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    following_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow
+    )
+
+    __table_args__ = (
+        CheckConstraint("follower_id != following_id", name="check_no_self_follow"),
+    )
+
+    follower: Mapped["User"] = relationship("User", foreign_keys=[follower_id])
+    following: Mapped["User"] = relationship("User", foreign_keys=[following_id])
