@@ -209,3 +209,27 @@ class FeedResponse(BaseModel):
     items: list[FeedItemOut]
     next_cursor: Optional[str] = None
     has_more: bool = False
+
+# ── Users ─────────────────────────────────────────────────────────────────────
+
+class UserProfile(BaseModel):
+    """Public profile — no email exposed."""
+    id: uuid.UUID
+    username: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class UserProfileWithStats(UserProfile):
+    follower_count: int
+    following_count: int
+    is_following: bool  # whether the requesting user follows this profile
+
+
+class FollowOut(BaseModel):
+    follower_id: uuid.UUID
+    following_id: uuid.UUID
+    created_at: datetime
+
+    model_config = {"from_attributes": True}

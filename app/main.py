@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import auth, feed, graphs, nodes, shares
+from app.routers import auth, feed, graphs, nodes, shares, users
 
 
 @asynccontextmanager
@@ -35,6 +35,7 @@ app.include_router(nodes.router, prefix=API_PREFIX)
 app.include_router(graphs.router, prefix=API_PREFIX)
 app.include_router(shares.router, prefix=API_PREFIX)
 app.include_router(feed.router, prefix=API_PREFIX)
+app.include_router(users.router, prefix=API_PREFIX)
 
 
 @app.get("/health")
